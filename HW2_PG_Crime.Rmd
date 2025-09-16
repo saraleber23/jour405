@@ -1,0 +1,84 @@
+---
+title: "HW2 Prince George's County Crime"
+---
+
+In this assignment, we will be working with a dataset reporting the number of crimes by month in Prince George's County, Maryland, for every month in 2024. 
+
+### Task 1: Load the Tidyverse
+
+You will need to load the tidyverse library
+
+```{r}
+library (tidyverse)
+library(janitor)
+```
+
+Then you'll load the data from the web. The URL for the data is: https://raw.githubusercontent.com/dwillis/jour405/refs/heads/main/data/pg_crime_totals_2024.csv. You will create a dataframe called `pg_crime` that contains the data from this URL.
+
+### Task 2: Load the Data and Describe It
+
+```{r}
+pg_crime <- read_csv ("https://raw.githubusercontent.com/dwillis/jour405/refs/heads/main/data/pg_crime_totals_2024.csv")
+```
+```{r}
+pg_crime |> 
+  clean_names()
+```
+
+### Task 3: Describe the Data
+
+You should examine that dataframe carefully by clicking on it in the Environment tab in RStudio. Write a couple of sentences describing the categories of incidents. From a reporting standpoint, are any of the categories more important than others? Why or why not? Do any of them make the job of summarizing the data more difficult? Why or why not?
+
+
+From a reporting standpoint, I would say the homicides, assaults,accidents,  sex offenses and thefts are the ones to look out the most because those are always the ones you hear the most about on the news and what people care about the most. I think it makes the job easier because you are exposed to so much data and patterns that could give you a good story.
+
+### Task 4: Calculating Averages
+
+Calculate the total number of incidents per month for each category using `mutate()`, calling the new column `total_incidents`. Then calculate the average number of incidents per month for each category of crime, calling the new column `average_incidents`. Assign the result to a new dataframe called `pg_crime_averages`.
+
+```{r}
+pg_crime_averages <- pg_crime |> 
+  mutate(total_incidents = `Jan`+`Feb`+ `Mar`+`Apr`+`May`+`Jun`+`Jul`+`Aug` +`Sep`+`Oct`+`Nov`+`Dec`) |>
+  mutate(average_incidents = total_incidents/12)
+```
+
+### Task 5: Describe the Averages
+
+Examine the new dataframe, `pg_crime_averages`, by clicking on it in the Environment tab in RStudio. Write a couple of sentences describing the average number of incidents per month for each category. Which categories have the highest average number of incidents per month? Which have the lowest? What does this tell you about the pattern of crime in Prince George's County? Are there categories that you have questions about? Why or why not?
+
+The category that has the highest average of incidents is accidents which had an average of 481.3. The second highest was auto stolen which had an average of 399.2.The lowest average was homicides at an average of 5.83. What this tells us about the patterns in the crimes in Prince Georges County is that there tends to be a lot of property and vehicle related crimes instead of violent crimes. I guess my main questions is why is that like that and why are those crimes so significantly popular?
+
+
+
+### Task 6: Testing a Theory
+
+One theory about crime is that it is more likely to occur in the summer months. Test this theory by creating three new columns using `mutate()` that calculate the percentage change compared to the average for each category of crime for the months of June, July, and August. Call the new columns `june_change`, `july_change`, and `august_change`. Assign the result to a new dataframe called `summer_crime_averages`.
+
+```{r}
+summer_crime_averages <- pg_crime_averages |> 
+  mutate(
+    june_change = ((Jun - average_incidents) / average_incidents) * 100,
+    july_change = ((Jul - average_incidents) / average_incidents) * 100,
+    august_change = ((Aug- average_incidents) / average_incidents) * 100
+  )
+```
+```
+
+### Task 7: Describe the Summer Crime Averages
+
+Look at the `summer_crime_averages` dataframe by clicking on it in the Environment tab in RStudio. Write a couple of sentences describing the percentage change in the average number of incidents per month for each category of crime for the months of June, July, and August. Do you see any patterns? What does this tell you about the theory that crime is more likely to occur in the summer months?
+
+The percentage in June showed a lot of uptake in crimes (11 out of 18 categories increased), July and August showed sharp ups and downs in crime. One pattern I saw was how some crimes seemed to spike at the beginning of the summer in june and then decrease by august. I think this shows how crimes usually pick up in the summer because kids get out of school, more people are outside and the days are longer.This proves the theory that crime is more likely to occur in the summer months.
+
+
+### Task 8: What's the Story?
+
+Write up a lede and nutgraf of a story focused on the crime data in Prince George's County. It could be from any of the dataframes you've created in this assignment. The lede should be a single sentence that summarizes the most important information in the data. The nutgraf should be a paragraph that provides more context and explains why the data is important.
+
+As the temperature rises in the summer, so are the crime rates in Prince Georges County.
+
+In the beggining of summer, crime data reveals how the number of crimes rise. 11 out of 18 categories of crime have an uptake of crime in June. Some of these include sex offenses, homicides and vehicle robberies. But by August, 7 out of 18 crime categories increased compared to the 11 out of 18 in June. Sex offenses, homicides and vehicle robberies have all decreased by the end of summer in August. Due to school being out during summer, the days being longer and more people are outside crime seems to spike in Prince George's County in the summer. It is important citzens in the county take precautions during the summer. 
+
+### Task 9: Save Your Work and Put it on GitHub
+
+Save this notebook, then commit it to your local repository. Push the changes to your GitHub repository and submit the URL for this file in ELMS.
