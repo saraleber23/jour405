@@ -1,0 +1,145 @@
+---
+title: "midterm_key_oct_8"
+author: "Rob Wells"
+date: "2025-10-15"
+output: html_document
+---
+Sara Leber
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# JOUR405: Statistics for Journalists
+## Midterm Exam - Fall 2025
+
+For this exam, you'll analyze several datasets using R and the statistical concepts we've covered in class. Load the tidyverse before beginning, then complete each task. Write your code in the provided blocks and answer the questions in complete sentences.
+
+# Load tidyverse
+```{r}
+library(tidyverse)
+```
+
+## Part 1: Restaurant Health Inspections (25 points)
+
+The first dataset contains restaurant health inspection scores from Montgomery County. Load the data from: `https://raw.githubusercontent.com/dwillis/jour405/refs/heads/main/data/montco_inspections.csv`
+
+The dataset includes the name of the establishment, the number of points for critical and non-critical areas, the total points, maximum points possible and the compliance score and grade.
+
+## Task 1: Read the data**
+```{r}
+health_scores <- read_csv ("https://raw.githubusercontent.com/dwillis/jour405/refs/heads/main/data/montco_inspections.csv")
+```
+
+
+## Task 2: Calculate the mean and standard deviation maximum and minimum of compliance scores. Put the results in a new dataframe called "compliance_stats." 
+```{r}
+compliance_stats <- health_scores |> 
+  summarize(mean= mean(compliance_score), min = min(compliance_score), max = max(compliance_score), sd = sd(compliance_score))
+
+```
+
+## Task 3: Create a histogram of the compliance scores with a vertical line showing the mean. Include a headline. Include a headline and label the x and y axes.
+```{r}
+compliance_stats |>
+ggplot () +
+geom_histogram(aes (x = mean), binwidth = 1) +
+geom_vline (aes (xintercept = mean (health_scores)), color = "red", linetype = "dashed", size = 1) +
+geom_vline(aes (xintercept = mean (health_scores) - sd (health_scores)), color = "blue", linetype = "dashed", size = 1) +
+geom_vline(aes (xintercept = mean (health_scores) + sd(health_scores)), color = "blue", Linetype = "dashed", size = 1
+
+```
+
+## Task 4: Write 2-3 sentences interpreting what the standard deviation and histogram tell us about the distribution of compliance scores. What would be newsworthy about this distribution? What's the story here? 
+
+**Write your answer here:**
+
+
+## Part 2: High School Athletics (30 points)
+
+The second dataset shows participation numbers in high school sports across Maryland counties in 2024, broken down by sport and gender. Load the data from: `https://raw.githubusercontent.com/dwillis/jour405/refs/heads/main/data/md_hs_participation.csv`
+
+# Task 5: Load the high school participation data
+```{r}
+participation_numbers <- read_csv("https://raw.githubusercontent.com/dwillis/jour405/refs/heads/main/data/md_hs_participation.csv")
+```
+
+
+#Task 6: Add two columns called total and girls_pct.  
+Add two columns called total and girls_pct using mutate(), with the total adding together boys and girls and girls_pct being the percentage of the total represented by girls participants. 
+```{r}
+total <- participation_numbers  |> mutate(total_num = boys + girls)
+total |> mutate(girls_pct = total_num/girls)
+
+```
+
+#Task 7: Calculate correlation between boys and girls participation
+```{r}
+total |> summarize(correlation = cor(boys, girls, method="pearson"))
+```
+
+#Task 8: Create a scatterplot showing this relationship, adding a line of best fit. Include a headline and label the x and y axes.
+```{r}
+total |> 
+  ggplot() +
+  geom_point(aes(x=boys, y=girls)) +
+  geom_smooth(aes(x=boys, y=girls), method="lm") +
+  labs(title = "Relationship between girls and boys participation in Maryland counties", x = "boys", y ="girls")
+ 
+
+
+```
+
+
+# Task 9: In 2-3 sentences, explain what the correlation coefficient and scatterplot reveal about gender equity in Maryland high school sports participation. How do you interpret the school districts that are below the line vs those that are above? Which school districts are most worth examining further, and why? (10 points)
+
+**Write your answer here: The correlation is very high between gender and Maryland high school sports participation since it is almost near 1. The ones that are below the line vs the ones that are above the lines means there are some that have higher gender participation and some that exceed over the line because those could have more students or more athletic students.**
+
+## Part 3: Maryland Car Theft Rates (25 points)
+
+Your editor has assigned you a story about car thefts in Maryland and wants you to analyze the data to find out which counties have the highest rates. The fourth dataset contains car theft statistics for Maryland counties in 2023 and population. Load the data from: `https://raw.githubusercontent.com/dwillis/jour405/refs/heads/main/data/md_car_thefts.csv` and complete the following tasks:
+
+#Task 10: Load the car thefts data
+```{r}
+car_thefts <- read_csv ("https://raw.githubusercontent.com/dwillis/jour405/refs/heads/main/data/md_car_thefts.csv")
+```
+
+#Task 11: Using mutate, add a column that calculates the rate of car thefts for each county - you need to choose the per capita rate 
+```{r}
+county_thefts <- car_thefts |> mutate(county_thefts = population/2023)
+```
+
+#Task 12: Calculate the median car theft rate and the total number of car thefts statewide. Which counties have rates above the median? 
+```{r}
+
+```
+
+
+#Task 13: Write 2-3 sentences describing what these calculations reveal about the distribution of car thefts in Maryland. What's the lede of a story about your findings? 
+
+**Write your answer here:**
+
+## Part 4: Data Analysis Scenario (20 points)
+
+#Task 14: Essay Question.
+
+You receive a tip that local emergency response times have gotten significantly worse over the past year. You obtain monthly data on response times for police, fire and ambulance calls.
+
+Write 3-4 sentences explaining:
+1. What statistical measures would you calculate to verify this claim? (10 points)
+2. What visualizations would help readers understand the trends? (5 points)
+3. What additional context or data would you need to make this a complete story? (5 points)
+
+**Write your answer here: I would calculate the mean and median of the time that it usually takes emergency crews to respond and then use a scatter plot or line graph to show that. Comparing times for police, fire, and ambulance calls.I think interviewing people on their thoughts could make it interesting.**
+
+# Excellent Response
+
+
+### Submission Instructions
+- Save your work frequently
+- Make sure all code blocks run without errors
+- Provide clear explanations for your analytical choices
+- Submit both your code and written responses
+- Load this test to GitHub and submit the link in Elms
+
+Good luck!
