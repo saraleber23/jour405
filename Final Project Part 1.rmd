@@ -1,0 +1,76 @@
+---
+title: "Final Project"
+output: html_document
+date: "2025-11-11"
+---
+
+```{r load-libraries}
+# Load required libraries
+library(tidyverse)
+library(lubridate)
+library(dplyr)
+library(janitor) 
+
+```
+
+
+```{r load-libraries}
+billboard <- read_csv ("https://docs.google.com/spreadsheets/d/e/2PACX-1vRGVyUPm3B3wr5vEIy66lIJ_FrFa1drUoi0rM0VG2ZqsNLQP_AD-KYZT5c-UdDG1TDY1vDzzQ3wogUj/pub?gid=1077686609&single=true&output=csv")
+
+
+
+```
+What does it contain and what time period does it cover?
+
+-This data contains the Billboard's 100 Numbers One songs from August 1958-January 2025. It contains the artist, the song, the date, how long it was at number one, the ratings, the label, divisiveness, the age of the artists, the race of the artists, the gender of the artist and more.
+
+--Which columns will be most important for your analysis?
+
+The most important column for my analysis would be the "front person age" of the artists because this is what I am going to be focusing on.
+
+--What's missing that you might need or want?
+
+What is missing that I might need or want would be the data from February 2025- now. The data only goes to January 2025 which is almost a year ago, missing the data from most of this year.
+
+Select a relevant column and produce basic descriptive statistics on the mean, median, lowest and highest values.
+
+
+
+```{r}
+billboard <- billboard %>% 
+  clean_names()
+
+billboard_stats <- billboard %>%
+  summarise(
+    mean_age = mean(front_person_age, na.rm = TRUE),
+    median_age = median(front_person_age, na.rm = TRUE),
+    sd_age = sd(front_person_age, na.rm = TRUE)
+  )
+
+billboard_stats
+```
+
+```{r}
+anova_result <- aov(front_person_age ~ `cdr_genre`, data = billboard)
+summary(anova_result)
+
+```
+My research question: "Do artists from different music genres on the Billboard Hot 100 differ in their average age?”
+My null hypothesis:The mean age of artists on the Billboard Hot 100 is the same across all genres.
+My Alternative hypothesis:The mean age of artists on the Billboard Hot 100 differs for at least one genre.
+
+The F value is 2.294 which means that the front person's age between genres is about 2.3 times larger than the variation within the genre. This means that there is a meaningful relationship between the two. The p-value is 0.0000829. Since this number is very low and below the 0.05 threshold, that means there is strong evidence that atleast one of the group's mean is different from the others. This means I can reject the null hypothesis since the p-value is very low and under 0.05. This means we can accept the alternative hypothesis of the mean age of artists on the Billboard Hot 100 differs for at least one genre.
+
+```{r}
+ TukeyHSD(anova_result)
+```
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+The Tukey test shows how there are many differences between ages of artists in genres.There are a lot of differences in the different genres as seen in the Tukey test, showing how the hypothesis of the mean age of artists on the Billboard Hot 100 differs for at least one genre. For example, between Funk/Soul and Jazz-Blues has about a -18 difference between the two genre's artist age. Another example is between Pop, Electronic/Dance-Folk and Country Rock there is an about -8 difference between the three categories. This shows how the statement is true of there being atleast one genre that has a different mean age on the Billboard Hot 100. 
+
+--What questions do you have about it or need help answering?
+I wonder how big the difference of ages are between artist ages and genres. I wonder what genre tend to have the oldest or have the youngest artists. I also wonder if we have data from this whole year, if it would have changed anything.
