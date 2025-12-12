@@ -1,0 +1,139 @@
+---
+title: "Final Project"
+output: html_document
+date: "2025-11-11"
+---
+Sara Leber
+
+```{r load-libraries}
+# Load required libraries
+library(tidyverse)
+library(lubridate)
+library(dplyr)
+library(janitor) 
+
+```
+
+
+```{r load-libraries}
+billboard <- read_csv ("https://docs.google.com/spreadsheets/d/e/2PACX-1vRGVyUPm3B3wr5vEIy66lIJ_FrFa1drUoi0rM0VG2ZqsNLQP_AD-KYZT5c-UdDG1TDY1vDzzQ3wogUj/pub?gid=1077686609&single=true&output=csv")
+
+
+
+```
+What does it contain and what time period does it cover?
+
+-This data contains the Billboard's 100 Numbers One songs from August 1958-January 2025. It contains the artist, the song, the date, how long it was at number one, the ratings, the label, divisiveness, the age of the artists, the race of the artists, the gender of the artist and more.
+
+--Which columns will be most important for your analysis?
+
+The most important column for my analysis would be the "front person age" of the artists because this is what I am going to be focusing on.
+
+--What's missing that you might need or want?
+
+What is missing that I might need or want would be the data from February 2025- now. The data only goes to January 2025 which is almost a year ago, missing the data from most of this year.
+
+Select a relevant column and produce basic descriptive statistics on the mean, median, lowest and highest values.
+
+
+
+```{r}
+billboard <- billboard %>% 
+  clean_names()
+
+billboard_stats <- billboard %>%
+  summarise(
+    mean_age = mean(front_person_age, na.rm = TRUE),
+    median_age = median(front_person_age, na.rm = TRUE),
+    sd_age = sd(front_person_age, na.rm = TRUE)
+  )
+
+billboard_stats
+```
+#rsw comment: after each chunk, explain what you did and its significance
+The significance of this is setting up there being a mean, median and standard deviation for the billboard stats with the column that I need to focus on which is needed for this which is the age of the artists(front_person_age).
+
+```{r}
+anova_result <- aov(front_person_age ~ `cdr_genre`, data = billboard)
+summary(anova_result)
+
+```
+My research question: "Do artists from different music genres on the Billboard Hot 100 differ in their average age?”
+My null hypothesis:The mean age of artists on the Billboard Hot 100 is the same across all genres.
+My Alternative hypothesis:The mean age of artists on the Billboard Hot 100 differs for at least one genre.
+
+The F value is 2.294 which means that the front person's age between genres is about 2.3 times larger between genres than the variation within genres. The F value is the ratio of the variability between groups with the variability of the observations within the groups. This means that there is a meaningful relationship between the two. The p-value is 0.0000829. Since this number is very low and below the 0.05 threshold, that means there is strong evidence that atleast one of the group's mean is different from the others. This means I can reject the null hypothesis since the p-value is very low and under 0.05. This means we can accept the alternative hypothesis of the mean age of artists on the Billboard Hot 100 differs for at least one genre.
+
+#rsw comment - very good but on the F statistic - it is measuring the variation between genres. So it is showing it's 2.3 times larger between genres than the variation within genres. In order words, the F value is a ratio of the variability between groups with the variability of the observations within the groups
+
+
+```{r}
+ TukeyHSD(anova_result)
+```
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+The Tukey test shows how there are many differences between ages of artists in genres.There are a lot of differences in the different genres as seen in the Tukey test, showing how the hypothesis of the mean age of artists on the Billboard Hot 100 differs for at least one genre. For example, between Funk/Soul and Jazz-Blues has about a -18 difference between the two genre's artist age. Another example is between Pop, Electronic/Dance-Folk and Country Rock there is an about -8 difference between the three categories. This shows how the statement is true of there being atleast one genre that has a different mean age on the Billboard Hot 100. 
+
+--What questions do you have about it or need help answering?
+I wonder how big the difference of ages are between artist ages and genres. I wonder what genre tend to have the oldest or have the youngest artists. I also wonder if we have data from this whole year, if it would have changed anything.
+
+```{r}
+billboard_clean <- billboard %>%
+  filter(!is.na(front_person_age), !is.na(cdr_genre)) %>%
+  mutate(cdr_genre = as.factor(cdr_genre))
+ggplot(billboard_clean, aes(x = cdr_genre, y = front_person_age)) +
+  geom_boxplot(fill = "skyblue", color = "darkblue", outlier.color = "red", outlier.shape = 16) +
+  labs(
+    title = "Distribution of Billboard Hot 100 Artists' Ages by Genre",
+    x = "Genre",
+    y = "Front Person Age"
+  ) +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    plot.title = element_text(face = "bold", size = 14)
+  )
+
+```
+This chart shows the distribution of the Billboard Hot 100 Artists' Age by Genre. The areas that are in the box represents the middle 50%. The line inside the box means that is the median of the data. The lines extending from the box show the approximate ranges of the ages within the Q1 and Q3. From looking at this chart, you can see which genres tend to have younger or older artists. The ones with longer boxes show there is more variation in artists ages.Looking at this chart you can see, there tends to be Hip-Hop/Rap, Electronic, and Pop tend to have the younger artists since they tend to have lower median ages and narrow age ranges. But Jazz, Rock and Folk look like they tend to have older median ages and a large broad spread which means there is a large variation of ages in those categories. There are many categories that have outliers (the red dots) which represents the artists that have ages that differ a lot from the normal range for the certain genre.
+
+```{r}
+sample_mean <- mean(billboard$front_person_age, na.rm = TRUE)
+pop_mean <- 30                
+n <- sum(!is.na(billboard$front_person_age))
+sigma <- sd(billboard$front_person_age, na.rm = TRUE)
+z_value <- (sample_mean - pop_mean) / (sigma / sqrt(n))
+
+
+p_value <- 2 * (1 - pnorm(abs(z_value)))
+
+z_value
+p_value
+ 
+
+```
+
+This was the z-score test. The results from this test shows how the z-value is -8.679 and the p-value is 0. The z-value being -8.68 means that my sample mean is about 8.7 standard lower than 30. This test shows the average age of the artists is about 28 years old which is lower than the hypothesized number used in the test of 30 years old. The z-value is very big in magnitude which means it is very far from what we would think if the true mean happened to be 30. Anything that is above positive or negative 2 is considered statistically significant usually so that means -8.679 is very large and extreme. The P-value being about 0 means that the chance of having a sample mean that is this far from 30 randomly is about 0 percent. This shows that the difference is statistically significant. Overall, this shows that there is extremely strong evidence that the mean age of the Billboard front-persons age is not 30. Going by specifics the persons age is probably around 28. The z-score correlates to the mean being 28.27 because when the z s-score of -8.679 shows us how far the average age is from 30.This is helpful information to my project because it helps give insight to my data. 
+
+```{r}
+result <- t.test(billboard$front_person_age, mu = 30)
+result$statistic    # t-value
+result$p.value      # p-value
+result$estimate     # sample mean
+```
+This is a t-test. I am using a t-test now because it also is a good test with my data to use. From the t-test, I can see that the t-value is -8.679 and the p-value is 1.33 × 10⁻17 and the sample mean if about 28.27. This test showed how the mean of the Billboard front-person ages has an average of around 28 which is lower than 30 that we used in this example. Like the z-score test, the t-value being -8.679 shows how the mean is about 8.7 standard units below 30 which shows how the average mean of the sample makes sense. The p-value is extremely tiny which shows it is strong evidence against the null hypothesis. This means we have more proof that we can reject the null hypthesis because we know the mean age is under 30 and not 30.
+
+*Draft story pitch*
+
+Story ideas:
+"Have Young Artists Been Dominating the Charts?"
+"The Youngest Stars on the Billboard's Hot 100"
+"What Ages Do Artists Tend To Peak"
+
+I think the story of "Have Young Artists Been Dominating the Charts?" is the best. With my data that I have found with my tests and analysis. I have a lot of important information that I could use in this story. With my findings from my tests, in the story we can add how the ages across genres are not the same and how the average age of most artists are under 30. Knowing this, this story can dive into how most of the artists are under 30 and how young artists have taken over the charts. The focus could be on examples of young artists throughout the years and their age and what song was popular. For example, the song "Poor Little Fool" by Ricky Nelson could be used since he was 18 when his song was a Billboard Hot 100 Number One. There are multiple examples of this. This could lead into why do we think artists hit their peak when their young. I think this could be super interesting and something I would love to read personally. The reporting plan could start with sorting all the data and information into one place. Then begin writing the main findings. Next, researching the findings and then looking into why do we think artists have peak songs when their young. Diving into articles and reports on this topic can add to this. After finding out and sorting all the information and data, I could then fully write the story. I could also interview music clubs, local musicians and other people who are passionate about music about their thoughts on this topic and why they might think most artists peak when their young. I think this story could be super successful. 
+
+
